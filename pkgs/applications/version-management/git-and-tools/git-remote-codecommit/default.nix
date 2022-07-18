@@ -3,14 +3,14 @@
 
 buildPythonApplication rec {
   pname = "git-remote-codecommit";
-  version = "1.15.1";
+  version = "1.16";
   disabled = !isPy3k;
 
   src = fetchFromGitHub {
     owner = "aws";
     repo = pname;
     rev = version;
-    sha256 = "1vvp7i8ghmq72v57f6smh441h35xnr5ar628q2mr40bzvcifwymw";
+    sha256 = "sha256-E7ffy4G6KsfTX6tjg2nP2FGDBqGK+0a9nVEc/rDhmXM=";
   };
 
   propagatedBuildInputs = [ botocore ];
