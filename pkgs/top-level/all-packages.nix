@@ -3866,6 +3866,10 @@ with pkgs;
 
   glock = callPackage ../development/tools/glock { };
 
+  miniaudio = callPackage ../tools/audio/miniaudio { };
+
+  ada = callPackage ../development/tools/ada { };
+
   glslviewer = callPackage ../development/tools/glslviewer {
     inherit (darwin.apple_sdk.frameworks) Cocoa;
   };
@@ -10676,6 +10680,8 @@ with pkgs;
   };
 
   skydns = callPackage ../servers/skydns { };
+
+  skymodel = callPackage ../tools/graphics/skymodel { };
 
   sipcalc = callPackage ../tools/networking/sipcalc { };
 

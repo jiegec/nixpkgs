@@ -1,0 +1,26 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 3136e24..eb0db75 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -42,6 +42,7 @@ add_executable(glslViewer ${ROOT_SOURCE})
+ include_directories(deps/liblo)
+ target_include_directories(glslViewer PRIVATE deps)
+ target_link_libraries(glslViewer PRIVATE ada phonedepth)
++target_compile_definitions(glslViewer PRIVATE SUPPORT_LIBAV)
+ target_compile_definitions(glslViewer PRIVATE GLSLVIEWER_VERSION_MAJOR=${VERSION_MAJOR})
+ target_compile_definitions(glslViewer PRIVATE GLSLVIEWER_VERSION_MINOR=${VERSION_MINOR})
+ target_compile_definitions(glslViewer PRIVATE GLSLVIEWER_VERSION_PATCH=${VERSION_PATCH})
+diff --git a/deps/CMakeLists.txt b/deps/CMakeLists.txt
+index f525fc1..92dae48 100644
+--- a/deps/CMakeLists.txt
++++ b/deps/CMakeLists.txt
+@@ -1,7 +1,6 @@
+ ## Ada
+-add_subdirectory(ada)
+ add_subdirectory(phonedepth)
+ 
+ if (NOT EMSCRIPTEN) 
+     add_subdirectory(liblo/cmake)
+-endif()
+\ No newline at end of file
++endif()

@@ -1,0 +1,39 @@
+diff --git a/ArHosekSkyModel.h b/ArHosekSkyModel.h
+index 19ec82f..9bd851b 100644
+--- a/ArHosekSkyModel.h
++++ b/ArHosekSkyModel.h
+@@ -304,6 +304,10 @@ HINT #1:   if you want to model the sky of an earth-like planet that orbits
+ #ifndef _ARHOSEK_SKYMODEL_H_
+ #define _ARHOSEK_SKYMODEL_H_
+ 
++#ifdef __cplusplus
++extern "C" {
++#endif
++
+ typedef double ArHosekSkyModelConfiguration[9];
+ 
+ 
+@@ -447,5 +451,8 @@ double arhosekskymodel_solar_radiance(
+         double                      wavelength
+         );
+ 
++#ifdef __cplusplus
++}
++#endif
+ 
+ #endif // _ARHOSEK_SKYMODEL_H_
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+new file mode 100644
+index 0000000..142287a
+--- /dev/null
++++ b/CMakeLists.txt
+@@ -0,0 +1,9 @@
++cmake_minimum_required(VERSION 3.2)
++project(skymodel)
++
++file(GLOB HEADERS "${PROJECT_SOURCE_DIR}/*.h")
++
++add_library(skymodel STATIC ArHosekSkyModel.c)
++
++install(TARGETS skymodel DESTINATION lib)
++install(FILES ${HEADERS} DESTINATION include/skymodel)

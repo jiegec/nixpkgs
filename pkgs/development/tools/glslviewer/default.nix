@@ -1,47 +1,61 @@
-{ lib, stdenv, fetchFromGitHub, glfw, pkg-config, libXrandr, libXdamage
-, libXext, libXrender, libXinerama, libXcursor, libXxf86vm, libXi
-, libX11, libGLU, python3Packages, ensureNewerSourcesForZipFilesHook
+{ stdenv
+, lib
+, fetchFromGitHub
+, cmake
+, pkg-config
+, ffmpeg
+, ada
+, glfw
+, glm
+, stb
+, skymodel
+, libX11
+, libXrandr
+, libXinerama
+, libXcursor
+, libXi
+, libXext
+, libGLU
+, miniaudio
 , Cocoa
 }:
 
 stdenv.mkDerivation rec {
   pname = "glslviewer";
-  version = "1.6.8";
+  version = "2.1.2";
 
   src = fetchFromGitHub {
     owner = "patriciogonzalezvivo";
     repo = "glslViewer";
     rev = version;
-    sha256 = "0v7x93b61ama0gmzlx1zc56jgi7bvzsfvbkfl82xzwf2h5g1zni7";
+    sha256 = "sha256-xCz5aDQ3mEbnY9lou2b8/bfqQvsniHGxVa3JbiNw/g0=";
   };
 
-  nativeBuildInputs = [ pkg-config ensureNewerSourcesForZipFilesHook python3Packages.six ];
+  NIX_CFLAGS_COMPILE = "-I${stb}/include/stb";
+
+  NIX_LDFLAGS_BEFORE = "-lGL -lglfw -lskymodel -lada";
+
+  nativeBuildInputs = [ cmake pkg-config ];
+
   buildInputs = [
-    glfw libGLU glfw libXrandr libXdamage
-    libXext libXrender libXinerama libXcursor libXxf86vm
-    libXi libX11
-  ] ++ (with python3Packages; [ python setuptools wrapPython ])
-    ++ lib.optional stdenv.isDarwin Cocoa;
-  pythonPath = with python3Packages; [ pyyaml requests ];
+    ada
+    ffmpeg
+    glfw
+    glm
+    libX11
+    libXrandr
+    libXinerama
+    libXcursor
+    libXi
+    libXext
+    libGLU
+    miniaudio
+    skymodel
+  ] ++ lib.optional stdenv.isDarwin Cocoa;
 
-  # Makefile has /usr/local/bin hard-coded for 'make install'
-  preConfigure = ''
-    substituteInPlace Makefile \
-        --replace '/usr/local' "$out" \
-        --replace '/usr/bin/clang++' 'clang++'
-    substituteInPlace Makefile \
-        --replace 'python setup.py install' "python setup.py install --prefix=$out"
-    2to3 -w bin/*
-  '';
-
-  preInstall = ''
-    mkdir -p $out/bin $(toPythonPath "$out")
-    export PYTHONPATH=$PYTHONPATH:$(toPythonPath "$out")
-  '';
-
-  postInstall = ''
-    wrapPythonPrograms
-  '';
+  patches = [
+    ./use-external-ada.patch
+  ];
 
   meta = with lib; {
     description = "Live GLSL coding renderer";
