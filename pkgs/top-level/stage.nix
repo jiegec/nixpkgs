@@ -190,6 +190,15 @@ let
                               nixpkgsFun { inherit crossSystem; })
                               lib.systems.examples;
 
+    pkgsCrosstoolNg = lib.mapAttrs (name: _:
+                                    nixpkgsFun {
+                                      crossSystem = {
+                                        config = name;
+                                        useCrosstoolNg = true;
+                                      };
+                                    })
+                                    (import ../development/compilers/crosstool-ng/configs.nix);
+
     pkgsLLVM = nixpkgsFun {
       overlays = [
         (self': super': {

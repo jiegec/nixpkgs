@@ -73,6 +73,8 @@ in lib.init bootStages ++ [
              then buildPackages.llvmPackages.libcxxClang
            else if crossSystem.useLLVM or false
              then buildPackages.llvmPackages.clangUseLLVM
+           else if crossSystem.useCrosstoolNg or false
+             then buildPackages.crosstoolNgGcc.${crossSystem.config}
            else buildPackages.gcc;
 
       extraNativeBuildInputs = old.extraNativeBuildInputs
