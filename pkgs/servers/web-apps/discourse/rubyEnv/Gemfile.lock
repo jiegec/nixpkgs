@@ -118,6 +118,7 @@ GEM
     debug_inspector (1.1.0)
     diff-lcs (1.5.0)
     diffy (3.4.2)
+    digest (3.0.0)
     discourse-ember-rails (0.18.6)
       active_model_serializers
       ember-data-source (>= 1.0.0.beta.5)
@@ -194,11 +195,6 @@ GEM
     jwt (2.5.0)
     kgio (2.11.4)
     libv8-node (16.10.0.0)
-    libv8-node (16.10.0.0-aarch64-linux)
-    libv8-node (16.10.0.0-arm64-darwin)
-    libv8-node (16.10.0.0-x86_64-darwin)
-    libv8-node (16.10.0.0-x86_64-darwin-19)
-    libv8-node (16.10.0.0-x86_64-linux)
     listen (3.7.1)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
@@ -240,25 +236,21 @@ GEM
     mustache (1.1.1)
     net-http (0.2.2)
       uri
-    net-imap (0.3.0)
+    net-imap (0.2.3)
+      digest
       net-protocol
+      strscan
     net-pop (0.1.2)
       net-protocol
     net-protocol (0.1.3)
       timeout
-    net-smtp (0.3.2)
+    net-smtp (0.2.2)
+      digest
       net-protocol
+      timeout
     nio4r (2.5.8)
-    nokogiri (1.13.8)
+    nokogiri (1.13.10)
       mini_portile2 (~> 2.8.0)
-      racc (~> 1.4)
-    nokogiri (1.13.8-aarch64-linux)
-      racc (~> 1.4)
-    nokogiri (1.13.8-arm64-darwin)
-      racc (~> 1.4)
-    nokogiri (1.13.8-x86_64-darwin)
-      racc (~> 1.4)
-    nokogiri (1.13.8-x86_64-linux)
       racc (~> 1.4)
     oauth (1.1.0)
       oauth-tty (~> 1.0, >= 1.0.1)
@@ -318,7 +310,7 @@ GEM
     puma (5.6.5)
       nio4r (~> 2.0)
     r2 (0.2.7)
-    racc (1.6.0)
+    racc (1.6.1)
     rack (2.2.4)
     rack-mini-profiler (3.0.0)
       rack (>= 1.2.0)
@@ -467,6 +459,7 @@ GEM
       sprockets (>= 3.0.0)
     sshkey (2.0.0)
     stackprof (0.2.21)
+    strscan (3.0.4)
     test-prof (1.0.10)
     thor (1.2.1)
     tilt (2.0.11)
@@ -534,6 +527,7 @@ DEPENDENCIES
   cppjieba_rb
   css_parser
   diffy
+  digest (= 3.0.0)
   discourse-ember-rails (= 0.18.6)
   discourse-ember-source (~> 3.12.2)
   discourse-fonts
@@ -577,6 +571,9 @@ DEPENDENCIES
   multi_json
   mustache
   net-http
+  net-imap (~> 0.2.1)
+  net-pop (~> 0.1.1)
+  net-smtp (~> 0.2.1)
   nokogiri
   oj (= 3.13.14)
   omniauth
