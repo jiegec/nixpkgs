@@ -543,6 +543,15 @@ rec {
     };
   };
 
+  loongarch64-linux = {
+    linux-kernel = {
+      name = "loongarch64-linux";
+      target = "vmlinux";
+      autoModules = true;
+      baseConfig = "loongson3_defconfig";
+    };
+  };
+
   # This function takes a minimally-valid "platform" and returns an
   # attrset containing zero or more additional attrs which should be
   # included in the platform in order to further elaborate it.
@@ -563,6 +572,8 @@ rec {
       else aarch64-multiplatform
 
     else if platform.isRiscV then riscv-multiplatform
+
+    else if platform.isLoongArch64 then loongarch64-linux
 
     else if platform.parsed.cpu == lib.systems.parse.cpuTypes.mipsel then (import ./examples.nix { inherit lib; }).mipsel-linux-gnu
 
