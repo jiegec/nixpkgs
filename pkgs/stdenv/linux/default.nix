@@ -72,6 +72,7 @@
         else ./bootstrap-files/mips64el-unknown-linux-gnuabi64.nix);
       powerpc64le-linux = import ./bootstrap-files/powerpc64le-unknown-linux-gnu.nix;
       riscv64-linux = import ./bootstrap-files/riscv64-unknown-linux-gnu.nix;
+      loongarch64-linux = import ./bootstrap-files/loongarch64-unknown-linux-gnu.nix;
     };
     musl = {
       aarch64-linux = import ./bootstrap-files/aarch64-unknown-linux-musl.nix;
