@@ -24,6 +24,7 @@ let
     aarch64-linux.target = "aarch64";
     riscv32-linux.target = "riscv32";
     riscv64-linux.target = "riscv64";
+    loongarch64-linux.target = "loongarch64";
   };
 
   # For aarch64, we need to use '--target=aarch64-efi' when building,
@@ -35,6 +36,7 @@ let
     aarch64-linux.target = "arm64";
     riscv32-linux.target = "riscv32";
     riscv64-linux.target = "riscv64";
+    loongarch64-linux.target = "loongarch64";
   };
 
   canEfi = lib.any (system: stdenv.hostPlatform.system == system) (lib.mapAttrsToList (name: _: name) efiSystemsBuild);
