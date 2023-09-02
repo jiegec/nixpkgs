@@ -37,6 +37,7 @@ stdenv.mkDerivation rec {
       "microblaze-linux" "microblazeel-linux"
       "riscv64-linux" "riscv32-linux"
       "sparc-linux" "sparc64-linux"
+      "loongarch64-linux"
     ];
     license = licenses.gpl2;
   };
