@@ -61,7 +61,8 @@ in
     # mdbook errors out on risc-v due to a rustc bug
     # https://github.com/NixOS/nixpkgs/pull/242019
     # https://github.com/rust-lang/rust/issues/114473
-    !stdenv.buildPlatform.isRiscV
+    !stdenv.buildPlatform.isRiscV &&
+    !stdenv.buildPlatform.isLoongArch64
   )
 , enableStatic ? stdenv.hostPlatform.isStatic
 , withAWS ? !enableStatic && (stdenv.isLinux || stdenv.isDarwin), aws-sdk-cpp
