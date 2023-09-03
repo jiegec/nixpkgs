@@ -210,7 +210,7 @@ in
         startSession = true;
         allowNullPassword = true;
         showMotd = true;
-        updateWtmp = true;
+        updateWtmp = false;
       };
       chpasswd = { rootOK = true; };
     };
