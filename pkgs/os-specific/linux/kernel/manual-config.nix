@@ -1,5 +1,5 @@
 { lib, stdenv, buildPackages, runCommand, nettools, bc, bison, flex, perl, rsync, gmp, libmpc, mpfr, openssl
-, libelf, cpio, elfutils, zstd, python3Minimal, zlib, pahole, kmod, ubootTools
+, libelf, cpio, elfutils, zstd, python3Minimal, zlib, pahole, kmod, ubootTools, util-linux
 , fetchpatch
 }:
 
@@ -364,7 +364,7 @@ stdenv.mkDerivation ((drvAttrs config stdenv.hostPlatform.linux-kernel kernelPat
   enableParallelBuilding = true;
 
   depsBuildBuild = [ buildPackages.stdenv.cc ];
-  nativeBuildInputs = [ perl bc nettools openssl rsync gmp libmpc mpfr zstd python3Minimal kmod ubootTools ]
+  nativeBuildInputs = [ perl bc nettools openssl rsync gmp libmpc mpfr zstd python3Minimal kmod ubootTools util-linux ]
       ++ optional  (lib.versionOlder version "5.8") libelf
       ++ optionals (lib.versionAtLeast version "4.16") [ bison flex ]
       ++ optionals (lib.versionAtLeast version "5.2")  [ cpio pahole zlib ]

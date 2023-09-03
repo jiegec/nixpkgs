@@ -546,7 +546,7 @@ rec {
   loongarch64-linux = {
     linux-kernel = {
       name = "loongarch64-linux";
-      target = "vmlinux";
+      target = "all";
       autoModules = true;
       baseConfig = "loongson3_defconfig";
     };
