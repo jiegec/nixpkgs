@@ -1,4 +1,4 @@
-{ lib, stdenv, fetchurl, getopt, util-linuxMinimal, which, gperf, nix-update-script }:
+{ lib, stdenv, fetchurl, autoreconfHook, getopt, util-linuxMinimal, which, gperf, nix-update-script }:
 
 stdenv.mkDerivation rec {
   pname = "libseccomp";
@@ -11,7 +11,7 @@ stdenv.mkDerivation rec {
 
   outputs = [ "out" "lib" "dev" "man" "pythonsrc" ];
 
-  nativeBuildInputs = [ gperf ];
+  nativeBuildInputs = [ gperf autoreconfHook ];
   buildInputs = [ getopt ];
 
   patchPhase = ''
@@ -42,7 +42,6 @@ stdenv.mkDerivation rec {
     platforms = platforms.linux;
     badPlatforms = [
       "alpha-linux"
-      "loongarch64-linux"
       "m68k-linux"
       "microblaze-linux"
       "microblazeel-linux"
