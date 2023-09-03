@@ -100,7 +100,7 @@ in
 
     system.boot.loader.kernelFile = mkOption {
       internal = true;
-      default = pkgs.stdenv.hostPlatform.linux-kernel.target;
+      default = "vmlinuz-6.5.0";
       defaultText = literalExpression "pkgs.stdenv.hostPlatform.linux-kernel.target";
       type = types.str;
       description = lib.mdDoc ''
