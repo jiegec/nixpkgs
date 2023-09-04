@@ -1,0 +1,312 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 7847830..238e764 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -314,21 +314,23 @@ elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "SunOS" AND "${CMAKE_SYSTEM_PROCESSOR}" S
+ 	set(HOST_X86_64 true)
+ elseif("${CMAKE_SYSTEM_PROCESSOR}" MATCHES "(x86_64|amd64)")
+ 	set(HOST_X86_64 true)
+-elseif("${CMAKE_SYSTEM_NAME}" MATCHES "[i?86|x86]")
++elseif("${CMAKE_SYSTEM_PROCESSOR}" MATCHES "(i.86|x86)")
+ 	set(ENABLE_ASM false)
+ 	set(HOST_I386 true)
+-elseif("${CMAKE_SYSTEM_NAME}" MATCHES "mips64")
++elseif("${CMAKE_SYSTEM_PROCESSOR}" MATCHES "mips64")
+ 	set(HOST_MIPS64 true)
+-elseif("${CMAKE_SYSTEM_NAME}" MATCHES "mips")
++elseif("${CMAKE_SYSTEM_PROCESSOR}" MATCHES "mips")
+ 	set(HOST_MIPS true)
+-elseif("${CMAKE_SYSTEM_NAME}" MATCHES "powerpc")
++elseif("${CMAKE_SYSTEM_PROCESSOR}" MATCHES "powerpc")
+ 	set(HOST_POWERPC true)
+-elseif("${CMAKE_SYSTEM_NAME}" MATCHES "ppc64")
++elseif("${CMAKE_SYSTEM_PROCESSOR}" MATCHES "ppc64")
+ 	set(HOST_PPC64 true)
+-elseif("${CMAKE_SYSTEM_NAME}" MATCHES "riscv64")
++elseif("${CMAKE_SYSTEM_PROCESSOR}" MATCHES "riscv64")
+ 	set(HOST_RISCV64 true)
+-elseif("${CMAKE_SYSTEM_NAME}" MATCHES "sparc64")
++elseif("${CMAKE_SYSTEM_PROCESSOR}" MATCHES "sparc64")
+ 	set(HOST_SPARC64 true)
++elseif("${CMAKE_SYSTEM_PROCESSOR}" MATCHES "loongarch64")
++	set(HOST_LOONGARCH64 true)
+ else()
+ 	set(ENABLE_ASM false)
+ endif()
+diff --git a/crypto/CMakeLists.txt b/crypto/CMakeLists.txt
+index a364e86..d9dd7a0 100644
+--- a/crypto/CMakeLists.txt
++++ b/crypto/CMakeLists.txt
+@@ -1051,6 +1051,8 @@ elseif(HOST_SPARC64)
+ 	target_include_directories(crypto_obj PRIVATE bn/arch/sparc64)
+ elseif(HOST_X86_64)
+ 	target_include_directories(crypto_obj PRIVATE bn/arch/amd64)
++elseif(HOST_LOONGARCH64)
++	target_include_directories(crypto_obj PRIVATE bn/arch/loongarch64)
+ endif()
+ 
+ add_library(crypto $<TARGET_OBJECTS:crypto_obj> empty.c)
+diff --git a/crypto/bn/arch/loongarch64/bn_arch.h b/crypto/bn/arch/loongarch64/bn_arch.h
+new file mode 100644
+index 0000000..be870b4
+--- /dev/null
++++ b/crypto/bn/arch/loongarch64/bn_arch.h
+@@ -0,0 +1,86 @@
++/*	$OpenBSD: bn_arch.h,v 1.7 2023/07/09 10:37:32 jsing Exp $ */
++/*
++ * Copyright (c) 2023 Joel Sing <jsing@openbsd.org>
++ *
++ * Permission to use, copy, modify, and distribute this software for any
++ * purpose with or without fee is hereby granted, provided that the above
++ * copyright notice and this permission notice appear in all copies.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
++ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
++ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
++ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
++ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
++ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
++ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
++ */
++
++#include <openssl/bn.h>
++
++#ifndef HEADER_BN_ARCH_H
++#define HEADER_BN_ARCH_H
++
++#ifndef OPENSSL_NO_ASM
++
++#if defined(__GNUC__)
++
++#define HAVE_BN_ADDW
++
++static inline void
++bn_addw(BN_ULONG a, BN_ULONG b, BN_ULONG *out_r1, BN_ULONG *out_r0)
++{
++	BN_ULONG carry, r0;
++
++	__asm__ (
++	    "add.d %[r0], %[a], %[b] \n"
++	    "sltu  %[carry], %[r0], %[a] \n"
++	    : [carry]"=r"(carry), [r0]"=&r"(r0)
++	    : [a]"r"(a), [b]"r"(b));
++
++	*out_r1 = carry;
++	*out_r0 = r0;
++}
++
++#define HAVE_BN_MULW
++
++static inline void
++bn_mulw(BN_ULONG a, BN_ULONG b, BN_ULONG *out_r1, BN_ULONG *out_r0)
++{
++	BN_ULONG r1, r0;
++
++	/*
++	 * Unsigned multiplication using a mul.d/mulh.du pair. Note that the order
++	 * of these instructions is important, as they can potentially be fused
++	 * into a single operation.
++	 */
++	__asm__ (
++	    "mulh.du %[r1], %[a], %[b] \n"
++	    "mul.d   %[r0], %[a], %[b] \n"
++	    : [r1]"=&r"(r1), [r0]"=r"(r0)
++	    : [a]"r"(a), [b]"r"(b));
++
++	*out_r1 = r1;
++	*out_r0 = r0;
++}
++
++#define HAVE_BN_SUBW
++
++static inline void
++bn_subw(BN_ULONG a, BN_ULONG b, BN_ULONG *out_borrow, BN_ULONG *out_r0)
++{
++	BN_ULONG borrow, r0;
++
++	__asm__ (
++	    "sub.d %[r0], %[a], %[b] \n"
++	    "sltu  %[borrow], %[a], %[r0] \n"
++	    : [borrow]"=r"(borrow), [r0]"=&r"(r0)
++	    : [a]"r"(a), [b]"r"(b));
++
++	*out_borrow = borrow;
++	*out_r0 = r0;
++}
++
++#endif /* __GNUC__ */
++
++#endif
++#endif
+diff --git a/include/CMakeLists.txt b/include/CMakeLists.txt
+index 44ab86b..e296177 100644
+--- a/include/CMakeLists.txt
++++ b/include/CMakeLists.txt
+@@ -27,5 +27,7 @@ elseif(HOST_SPARC64)
+ 	file(READ arch/sparc64/opensslconf.h OPENSSLCONF)
+ elseif(HOST_X86_64)
+ 	file(READ arch/amd64/opensslconf.h OPENSSLCONF)
++elseif(HOST_LOONGARCH64)
++	file(READ arch/loongarch64/opensslconf.h OPENSSLCONF)
+ endif()
+ file(WRITE openssl/opensslconf.h "${OPENSSLCONF}")
+diff --git a/include/arch/loongarch64/opensslconf.h b/include/arch/loongarch64/opensslconf.h
+new file mode 100644
+index 0000000..748ed8f
+--- /dev/null
++++ b/include/arch/loongarch64/opensslconf.h
+@@ -0,0 +1,154 @@
++#include <openssl/opensslfeatures.h>
++/* crypto/opensslconf.h.in */
++
++#if defined(HEADER_CRYPTLIB_H) && !defined(OPENSSLDIR)
++#define OPENSSLDIR "/etc/ssl"
++#endif
++
++#undef OPENSSL_UNISTD
++#define OPENSSL_UNISTD <unistd.h>
++
++#undef OPENSSL_EXPORT_VAR_AS_FUNCTION
++
++#if defined(HEADER_IDEA_H) && !defined(IDEA_INT)
++#define IDEA_INT unsigned int
++#endif
++
++#if defined(HEADER_MD2_H) && !defined(MD2_INT)
++#define MD2_INT unsigned int
++#endif
++
++#if defined(HEADER_RC2_H) && !defined(RC2_INT)
++/* I need to put in a mod for the alpha - eay */
++#define RC2_INT unsigned int
++#endif
++
++#if defined(HEADER_RC4_H)
++#if !defined(RC4_INT)
++/* using int types make the structure larger but make the code faster
++ * on most boxes I have tested - up to %20 faster. */
++/*
++ * I don't know what does "most" mean, but declaring "int" is a must on:
++ * - Intel P6 because partial register stalls are very expensive;
++ * - elder Alpha because it lacks byte load/store instructions;
++ */
++#define RC4_INT unsigned int
++#endif
++#if !defined(RC4_CHUNK)
++/*
++ * This enables code handling data aligned at natural CPU word
++ * boundary. See crypto/rc4/rc4_enc.c for further details.
++ */
++#define RC4_CHUNK unsigned long
++#endif
++#endif
++
++#if (defined(HEADER_NEW_DES_H) || defined(HEADER_DES_H)) && !defined(DES_LONG)
++/* If this is set to 'unsigned int' on a DEC Alpha, this gives about a
++ * %20 speed up (longs are 8 bytes, int's are 4). */
++#ifndef DES_LONG
++#define DES_LONG unsigned int
++#endif
++#endif
++
++#if defined(HEADER_BN_H) && !defined(CONFIG_HEADER_BN_H)
++#define CONFIG_HEADER_BN_H
++#undef BN_LLONG
++
++/* Should we define BN_DIV2W here? */
++
++/* Only one for the following should be defined */
++/* The prime number generation stuff may not work when
++ * EIGHT_BIT but I don't care since I've only used this mode
++ * for debugging the bignum libraries */
++#define SIXTY_FOUR_BIT_LONG
++#undef SIXTY_FOUR_BIT
++#undef THIRTY_TWO_BIT
++#undef SIXTEEN_BIT
++#undef EIGHT_BIT
++#endif
++
++#if defined(HEADER_RC4_LOCL_H) && !defined(CONFIG_HEADER_RC4_LOCL_H)
++#define CONFIG_HEADER_RC4_LOCL_H
++/* if this is defined data[i] is used instead of *data, this is a %20
++ * speedup on x86 */
++#undef RC4_INDEX
++#endif
++
++#if defined(HEADER_BF_LOCL_H) && !defined(CONFIG_HEADER_BF_LOCL_H)
++#define CONFIG_HEADER_BF_LOCL_H
++#undef BF_PTR
++#endif /* HEADER_BF_LOCL_H */
++
++#if defined(HEADER_DES_LOCL_H) && !defined(CONFIG_HEADER_DES_LOCL_H)
++#define CONFIG_HEADER_DES_LOCL_H
++#ifndef DES_DEFAULT_OPTIONS
++/* the following is tweaked from a config script, that is why it is a
++ * protected undef/define */
++#ifndef DES_PTR
++#undef DES_PTR
++#endif
++
++/* This helps C compiler generate the correct code for multiple functional
++ * units.  It reduces register dependencies at the expense of 2 more
++ * registers */
++#ifndef DES_RISC1
++#undef DES_RISC1
++#endif
++
++#ifndef DES_RISC2
++#undef DES_RISC2
++#endif
++
++#if defined(DES_RISC1) && defined(DES_RISC2)
++YOU SHOULD NOT HAVE BOTH DES_RISC1 AND DES_RISC2 DEFINED!!!!!
++#endif
++
++/* Unroll the inner loop, this sometimes helps, sometimes hinders.
++ * Very much CPU dependent */
++#ifndef DES_UNROLL
++#define DES_UNROLL
++#endif
++
++/* These default values were supplied by
++ * Peter Gutman <pgut001@cs.auckland.ac.nz>
++ * They are only used if nothing else has been defined */
++#if !defined(DES_PTR) && !defined(DES_RISC1) && !defined(DES_RISC2) && !defined(DES_UNROLL)
++/* Special defines which change the way the code is built depending on the
++   CPU and OS.  For SGI machines you can use _MIPS_SZLONG (32 or 64) to find
++   even newer MIPS CPU's, but at the moment one size fits all for
++   optimization options.  Older Sparc's work better with only UNROLL, but
++   there's no way to tell at compile time what it is you're running on */
++ 
++#if defined( sun )		/* Newer Sparc's */
++#  define DES_PTR
++#  define DES_RISC1
++#  define DES_UNROLL
++#elif defined( __ultrix )	/* Older MIPS */
++#  define DES_PTR
++#  define DES_RISC2
++#  define DES_UNROLL
++#elif defined( __osf1__ )	/* Alpha */
++#  define DES_PTR
++#  define DES_RISC2
++#elif defined ( _AIX )		/* RS6000 */
++  /* Unknown */
++#elif defined( __hpux )		/* HP-PA */
++  /* Unknown */
++#elif defined( __aux )		/* 68K */
++  /* Unknown */
++#elif defined( __dgux )		/* 88K (but P6 in latest boxes) */
++#  define DES_UNROLL
++#elif defined( __sgi )		/* Newer MIPS */
++#  define DES_PTR
++#  define DES_RISC2
++#  define DES_UNROLL
++#elif defined(i386) || defined(__i386__)	/* x86 boxes, should be gcc */
++#  define DES_PTR
++#  define DES_RISC1
++#  define DES_UNROLL
++#endif /* Systems-specific speed defines */
++#endif
++
++#endif /* DES_DEFAULT_OPTIONS */
++#endif /* HEADER_DES_LOCL_H */

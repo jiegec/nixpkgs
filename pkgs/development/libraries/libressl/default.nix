@@ -15,7 +15,7 @@ let
   generic =
     { version
     , hash
-    , patches ? []
+    , patches ? [ ./fix-loongarch64.patch ]
     , knownVulnerabilities ? []
     }: stdenv.mkDerivation rec
   {
