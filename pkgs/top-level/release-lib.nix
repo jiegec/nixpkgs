@@ -28,6 +28,7 @@ rec {
     pkgs_i686_linux = packageSet' { system = "i686-linux"; };
     pkgs_aarch64_linux = packageSet' { system = "aarch64-linux"; };
     pkgs_riscv64_linux = packageSet' { system = "riscv64-linux"; };
+    pkgs_loongarch64_linux = packageSet' { system = "loongarch64-linux"; };
     pkgs_aarch64_darwin = packageSet' { system = "aarch64-darwin"; };
     pkgs_armv6l_linux = packageSet' { system = "armv6l-linux"; };
     pkgs_armv7l_linux = packageSet' { system = "armv7l-linux"; };
@@ -42,6 +43,7 @@ rec {
       else if system == "i686-linux" then pkgs_i686_linux
       else if system == "aarch64-linux" then pkgs_aarch64_linux
       else if system == "riscv64-linux" then pkgs_riscv64_linux
+      else if system == "loongarch64-linux" then pkgs_loongarch64_linux
       else if system == "aarch64-darwin" then pkgs_aarch64_darwin
       else if system == "armv6l-linux" then pkgs_armv6l_linux
       else if system == "armv7l-linux" then pkgs_armv7l_linux
