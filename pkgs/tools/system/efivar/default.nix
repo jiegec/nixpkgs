@@ -42,6 +42,7 @@ stdenv.mkDerivation rec {
     "mandir=$(man)/share/man"
     "includedir=$(dev)/include"
     "PCDIR=$(dev)/lib/pkgconfig"
+    "CFLAGS=-Wno-error"
   ];
 
   meta = with lib; {
