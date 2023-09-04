@@ -33,12 +33,12 @@ assert enableGoldDefault -> enableGold;
 let
   inherit (stdenv) buildPlatform hostPlatform targetPlatform;
 
-  version = "2.40";
+  version = "2.41";
 
   srcs = {
     normal = fetchurl {
       url = "mirror://gnu/binutils/binutils-${version}.tar.bz2";
-      hash = "sha256-+CmOsVOks30RLpRapcsoUAQLzyaj6mW1pxXIOv4F5Io=";
+      hash = "sha256-pMS+wFL3uDcAJOYDieGUN38/SLVmGEGOpRBn9nqqsws=";
     };
     vc4-none = fetchFromGitHub {
       owner = "itszor";
@@ -90,10 +90,6 @@ stdenv.mkDerivation (finalAttrs: {
     # not need to know binutils' BINDIR at all. It's an absolute path
     # where libraries are stored.
     ./plugins-no-BINDIR.patch
-
-    # CVE-2023-1972 fix to bfd/elf.c from:
-    # https://sourceware.org/git/?p=binutils-gdb.git;a=commit;h=c22d38baefc5a7a1e1f5cdc9dbb556b1f0ec5c57
-    ./CVE-2023-1972.patch
   ]
   ++ lib.optional targetPlatform.isiOS ./support-ios.patch
   # Adds AVR-specific options to "size" for compatibility with Atmel's downstream distribution
