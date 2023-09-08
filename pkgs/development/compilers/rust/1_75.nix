@@ -51,6 +51,7 @@ import ./default.nix {
     aarch64-apple-darwin = "af6a982cbed85807fb8e5c4ba85b8a76162b58945f4787e0a7dec32e901e8b3b";
     powerpc64le-unknown-linux-gnu = "bb1c9f0ab1016a2817afe8f72c03f8f1787fe44d0f9999669e0c1957a08e6213";
     riscv64gc-unknown-linux-gnu = "86561a8d630f634fdd7cb5899d40027103c907d9763a32770b7e2fd57dbd8473";
+    loongarch64-unknown-linux-gnu = "a919eb670e22d423e1b3889dcdd01acaa07428308fae9e1b7e5ad804c41f128c";
   };
 
   selectRustPackage = pkgs: pkgs.rust_1_75;
