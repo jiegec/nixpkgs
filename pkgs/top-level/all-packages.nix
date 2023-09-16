@@ -20663,7 +20663,7 @@ with pkgs;
     boost184
   ;
 
-  boost = boost181;
+  boost = boost183;
 
   boost_process = callPackage ../development/libraries/boost-process { };
 
