@@ -133,7 +133,7 @@ stdenv.mkDerivation rec {
   doCheck = (!isCross)
     && (stdenv.hostPlatform.libc == "glibc" || stdenv.hostPlatform.libc == "musl")
     && !(stdenv.hostPlatform.libc == "musl" && stdenv.hostPlatform.isAarch64)
-    && !stdenv.isAarch32;
+    && !stdenv.isAarch32 && !stdenv.hostPlatform.isLoongArch64; # loongarch64 failed in mv/i-1.pl
 
   # Prevents attempts of running 'help2man' on cross-built binaries.
   PERL = if isCross then "missing" else null;
