@@ -80,8 +80,8 @@ stdenv.mkDerivation rec {
   # Backtrace unwinding tests rely on glibc-internal symbol names.
   # Musl provides slightly different forms and fails.
   # Let's disable tests there until musl support is fully upstreamed.
-  doCheck = !stdenv.hostPlatform.isMusl;
-  doInstallCheck = !stdenv.hostPlatform.isMusl;
+  doCheck = !stdenv.hostPlatform.isMusl && !stdenv.hostPlatform.isLoongArch64;
+  doInstallCheck = !stdenv.hostPlatform.isMusl && !stdenv.hostPlatform.isLoongArch64;
 
   passthru.updateScript = gitUpdater {
     url = "https://sourceware.org/git/elfutils.git";
