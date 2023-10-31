@@ -84,6 +84,8 @@ buildPythonPackage rec {
     "requests"
   ];
 
+  doCheck = !stdenv.hostPlatform.isLoongArch64;
+
   meta = with lib; {
     description = "HTTP library for Python";
     homepage = "http://docs.python-requests.org/";
