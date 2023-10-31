@@ -9,7 +9,8 @@ let
   # musl is security-focused and generally more minimal, so it's a better choice here.
   # The dynamic linker is still a fairly complex piece of code, and the wrappers are
   # quite small, so linking it statically is more appropriate.
-  securityWrapper = sourceProg : pkgs.pkgsStatic.callPackage ./wrapper.nix {
+  # No musl support on loongarch, use glibc
+  securityWrapper = sourceProg : pkgs.pkgs.callPackage ./wrapper.nix {
     inherit sourceProg;
 
     # glibc definitions of insecure environment variables
