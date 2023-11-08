@@ -29,6 +29,7 @@ stdenv.mkDerivation rec {
       stripLen = 1;
       hash = "sha256-8TwyZVy8pQwq5Fl8cy9xJWtdckwL+QK0+DL5EHDLYUY=";
     })
+    ./loongarch.patch
   ];
 
   buildInputs = [ openssl ];
